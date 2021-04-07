@@ -10,6 +10,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.centery = y
         self.rect.x = x
         self.speed_y = 0
+        self.score = 0
         
     def update(self):
         self.speed_y = 0
@@ -24,3 +25,8 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > 800:
             self.rect.bottom = 800
         
+    def sum_score(self):
+        self.score += 1
+
+    def get_score(self):
+        return self.score

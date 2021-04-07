@@ -20,5 +20,11 @@ class Ball(pygame.sprite.Sprite):
     
     def change_x_dir(self):
         self.speed_x = -self.speed_x
-        
+
+    def get_x_pos(self):
+        return self.rect.x
+    
+    def set_pos(self, x, y):
+        self.rect.x = x 
+        self.rect.y = y
     
