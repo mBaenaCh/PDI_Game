@@ -36,9 +36,32 @@ def draw_text(surface, text, size, x, y):
     text_rect.midtop = (x, y)
     surface.blit(text_surface, text_rect)
 
+def show_end_game_screen(text):
+    screen.blit(background, [0, 0])
+    draw_text(screen, text, 50, WIDTH // 2, HEIGHT // 2)
+    draw_text(screen, "Presione cualquier tecla para volver a jugar", 50, WIDTH // 2, (HEIGHT // 2) + 70)
+    pygame.display.flip()
+    restart = True
+    while restart:
+        clock.tick(30)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYUP:
+                restart = False
+
+end_game = False
+end_game_message = ""
 running = True
+
 while running:
-    clock.tick(120)
+    if end_game:
+        show_end_game_screen(end_game_message)
+        player_1.restart_score()
+        player_2.restart_score()
+        end_game = False
+
+    clock.tick(30)
     for event in pygame.event.get():
         if (event.type == pygame.QUIT):
             running = False
@@ -56,13 +79,26 @@ while running:
     if (ball.get_x_pos() < 0):
         ball.set_pos(WIDTH // 2, HEIGHT // 2)
         player_2.sum_score()
+        score = player_2.get_score()
+        player_1.set_pos(HEIGHT // 2)
+        player_2.set_pos(HEIGHT // 2)
 
     if (ball.get_x_pos() > WIDTH):
         ball.set_pos(WIDTH // 2, HEIGHT // 2)
         player_1.sum_score()
-
+        score = player_1.get_score()
+        player_1.set_pos(HEIGHT // 2)
+        player_2.set_pos(HEIGHT // 2)
+        
     player_1_score = player_1.get_score()
     player_2_score = player_2.get_score()
+
+    if player_1_score == 3:
+        end_game = True
+        end_game_message = "El jugador 1 ha ganado la partida"
+    elif player_2_score == 3:
+        end_game = True
+        end_game_message = "El jugador 2 ha ganado la partida"
 
     text_1 = f"Score: {player_1_score}"
     text_2 = f"Score: {player_2_score}"

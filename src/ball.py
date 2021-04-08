@@ -9,8 +9,8 @@ class Ball(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
-        self.speed_x = 1#random.randrange(-5, 5)
-        self.speed_y = 1#random.randrange(-5, 5)
+        self.speed_x = 5#random.randrange(-5, 5)
+        self.speed_y = 5#random.randrange(-5, 5)
         
     def update(self):
         self.rect.x += self.speed_x

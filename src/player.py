@@ -16,9 +16,9 @@ class Player(pygame.sprite.Sprite):
         self.speed_y = 0
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_UP]:
-            self.speed_y = -2
+            self.speed_y = -5
         if keystate[pygame.K_DOWN]:
-            self.speed_y = 2
+            self.speed_y = 5
         self.rect.y += self.speed_y
         if self.rect.top < 0:
             self.rect.top = 0
@@ -30,3 +30,9 @@ class Player(pygame.sprite.Sprite):
 
     def get_score(self):
         return self.score
+    
+    def restart_score(self):
+        self.score = 0
+    
+    def set_pos(self, y):
+        self.rect.centery = y
