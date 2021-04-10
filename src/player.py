@@ -9,21 +9,14 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centery = y
         self.rect.x = x
-        self.speed_y = 0
         self.score = 0
         
     def update(self):
-        self.speed_y = 0
-        keystate = pygame.key.get_pressed()
-        if keystate[pygame.K_UP]:
-            self.speed_y = -5
-        if keystate[pygame.K_DOWN]:
-            self.speed_y = 5
-        self.rect.y += self.speed_y
-        if self.rect.top < 0:
-            self.rect.top = 0
-        if self.rect.bottom > 800:
-            self.rect.bottom = 800
+        pass
+
+    def update_position(self, x, y):
+        self.rect.x = x
+        self.rect.y = y
         
     def sum_score(self):
         self.score += 1

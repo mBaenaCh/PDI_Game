@@ -1,6 +1,8 @@
 from player import Player
 from ball import Ball
 import pygame
+import cv2
+import numpy as np
 
 WIDTH = 800
 HEIGHT = 800
@@ -50,11 +52,54 @@ def show_end_game_screen(text):
             if event.type == pygame.KEYUP:
                 restart = False
 
+def get_position(mask, color):
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10))  
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations = 4)
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for c in contours:
+        M = cv2.moments(c)
+        if (M["m00"] == 0): M["m00"] = 1
+        x = int(M["m10"] / M["m00"])
+        y = int(M['m01'] / M['m00'])
+        new_contour = cv2.convexHull(c)
+        cv2.circle(frame, (x, y), 7, (0, 255, 0), -1)
+        cv2.putText(frame,f"{x}, {y}", (x + 10, y), font, 0.75, (0, 255, 0), 1, cv2.LINE_AA)
+        cv2.drawContours(frame, [new_contour], 0, color, 3)
+    return x, y
+
+cap = cv2.VideoCapture(0)
+azulBajo = np.array([100, 100, 20], np.uint8)
+azulAlto = np.array([125, 255, 255], np.uint8)
+
+redBajo1 = np.array([0, 100, 20], np.uint8)
+redAlto1 = np.array([5, 255, 255], np.uint8)
+redBajo2 = np.array([175, 100, 20], np.uint8)
+redAlto2 = np.array([179, 255, 255], np.uint8)
+  
 end_game = False
 end_game_message = ""
 running = True
 
 while running:
+    ret, frame = cap.read()
+    player_1_x = 0 
+    player_1_y = 0
+    player_2_x = 0 
+    player_2_y = 0
+    if ret == True:
+        frameHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        maskAzul = cv2.inRange(frameHSV, azulBajo, azulAlto)
+        maskRed1 = cv2.inRange(frameHSV, redBajo1, redAlto1)
+        maskRed2 = cv2.inRange(frameHSV, redBajo2, redAlto2)
+        maskRed = cv2.add(maskRed1, maskRed2)
+        player_1_x, player_1_y = get_position(maskRed, (0, 0, 255)) 
+        player_2_x, player_2_y = get_position(maskAzul, (255, 0, 0))
+        cv2.imshow('frame', frame)
+        key = cv2.waitKey(1)
+        if key == ord('q') or key == ord('Q'):
+            break
+
     if end_game:
         show_end_game_screen(end_game_message)
         player_1.restart_score()
@@ -66,7 +111,9 @@ while running:
         if (event.type == pygame.QUIT):
             running = False
 
-    all_sprites.update()
+    ball_group.update()
+    player_1.update_position(player_1_x, player_1_y)
+    player_2.update_position(player_2_x, player_2_y)
 
     hit_ball_player1 = pygame.sprite.spritecollide(player_1, ball_group, False)
     for hit in hit_ball_player1:
@@ -112,3 +159,5 @@ while running:
     pygame.display.update()
 
 pygame.quit()
+cap.release()
+cv2.destroyAllWindows()
