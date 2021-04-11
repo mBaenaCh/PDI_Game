@@ -4,8 +4,8 @@ import pygame
 import cv2
 import numpy as np
 
-WIDTH = 800
-HEIGHT = 800
+WIDTH = 640
+HEIGHT = 480
 #BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 #GREEN = (0, 255, 0)
@@ -16,12 +16,12 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Pong")
 clock = pygame.time.Clock()
 
-background = pygame.image.load("assets/bg.jpg").convert()
+background = pygame.image.load("src/assets/bg.jpg").convert()
 
 all_sprites = pygame.sprite.Group()
 
-player_1 = Player(10, HEIGHT // 2, "assets/player1.png")
-player_2 = Player(WIDTH - 30, HEIGHT // 2, "assets/player2.png")
+player_1 = Player(10, HEIGHT // 2, "src/assets/player1.png")
+player_2 = Player(WIDTH - 30, HEIGHT // 2, "src/assets/player2.png")
 ball = Ball(0, 10, WIDTH // 2, HEIGHT // 2)
 
 all_sprites.add(player_1)
@@ -53,9 +53,11 @@ def show_end_game_screen(text):
                 restart = False
 
 def get_position(mask, color):
+    x = 0 
+    y = 0
     font = cv2.FONT_HERSHEY_SIMPLEX
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10, 10))  
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations = 4)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations = 3)
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     for c in contours:
         M = cv2.moments(c)
@@ -69,6 +71,7 @@ def get_position(mask, color):
     return x, y
 
 cap = cv2.VideoCapture(0)
+
 azulBajo = np.array([100, 100, 20], np.uint8)
 azulAlto = np.array([125, 255, 255], np.uint8)
 
@@ -82,6 +85,7 @@ end_game_message = ""
 running = True
 
 while running:
+
     ret, frame = cap.read()
     player_1_x = 0 
     player_1_y = 0
@@ -112,9 +116,10 @@ while running:
             running = False
 
     ball_group.update()
+    
     player_1.update_position(player_1_x, player_1_y)
     player_2.update_position(player_2_x, player_2_y)
-
+    
     hit_ball_player1 = pygame.sprite.spritecollide(player_1, ball_group, False)
     for hit in hit_ball_player1:
         ball.change_x_dir()
@@ -140,10 +145,10 @@ while running:
     player_1_score = player_1.get_score()
     player_2_score = player_2.get_score()
 
-    if player_1_score == 3:
+    if player_1_score == 100:
         end_game = True
         end_game_message = "El jugador 1 ha ganado la partida"
-    elif player_2_score == 3:
+    elif player_2_score == 100:
         end_game = True
         end_game_message = "El jugador 2 ha ganado la partida"
 

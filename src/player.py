@@ -29,3 +29,4 @@ class Player(pygame.sprite.Sprite):
     
     def set_pos(self, y):
         self.rect.centery = y
+    
