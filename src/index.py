@@ -1,9 +1,9 @@
 #-----------------------------------------------------------------------------
 #------------------------------- Entrega 1 -----------------------------------
 #--------------------------------- P0ng game V.1 -----------------------------
-#-------- Por: Cristian Camilo Mendoza Mancera  ccamilo.mendoza@udea.edu.co --
-#--------       C.C.                                                        --
-#--------      Mateo Baena Chavarriaga          mateo.baena@udea.edu.co     --
+#------ Por: Cristian Camilo Mendoza Mancera || ccamilo.mendoza@udea.edu.co --
+#--------       C.C. 1020479827                                             --
+#--------      Mateo Baena Chavarriaga       ||   mateo.baena@udea.edu.co   --
 #--------       C.C. 1098781540                                             --
 #--------   Estudientes de ingenieria de Sistemas ----------------------------
 #------------------ Curso de procesamiento digital de imagenes ---------------
@@ -82,7 +82,7 @@ def get_position(mask, color):
     font = cv2.FONT_HERSHEY_SIMPLEX #Definicion de la fuente a mostrar 
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))  #Definicion del elemento estructurante cuadrado de 10x10
     #-------- Definicion de la operacion morfologica y la obtencion de contornos sobre la imagen resultante con la operacion morfologica ------
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations = 4)   #Realizacion de la operacion morfologica
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations = 8)   #Realizacion de la operacion morfologica
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)    #Obtencion de los contornos encontrados con el resultado de la operacion morfologica
 
     #Iteracion sobre todos los contornos encontrados
@@ -194,23 +194,31 @@ while running:  #Ciclo continuo para el funcionamiento del juego
         #Cambio de direccion en la posicion de X de la pelota (de derecha -> izquierda)
         ball.change_x_dir() #Direccion en Y no cambia de sentido, solo cambia el sentido de X
 
-    if (ball.get_x_pos() < 0):
-        ball.set_pos(WIDTH // 2, HEIGHT // 2)
-        player_2.sum_score()
-        score = player_2.get_score()
+    #--------------Condicion para que el jugador 2 marque 1 punto------------------
+    if (ball.get_x_pos() < 0): #Si se supera el margen izquierdo de la ventana
+        ball.set_pos(WIDTH // 2, HEIGHT // 2)   #Se reinicia la posicion de la pelota a la mitad de la ventana
+        player_2.sum_score()    #Se suma 1 punto al puntaje del jugador 2
+        score = player_2.get_score()    #Se actualiza el puntaje de ese jugador en el juego
+        #Se reinician las posicion de los jugadores luego de marcar un punto
+        player_1.set_pos(HEIGHT // 2)   
+        player_2.set_pos(HEIGHT // 2)
+
+    #--------------Condicion para que el jugador 1 marque 1 punto------------------
+    if (ball.get_x_pos() > WIDTH):  #Si se supera el margen derecho de la ventana
+        ball.set_pos(WIDTH // 2, HEIGHT // 2)   #Se reinicia la posicion de la pelota a la mitad de la ventana
+        player_1.sum_score()    #Se suma 1 punto al puntaje del jugador 1
+        score = player_1.get_score()    #Se actualiza el puntaje de ese jugador en el juego
+        #Se reinician las posicion de los jugadores luego de marcar un punto
         player_1.set_pos(HEIGHT // 2)
         player_2.set_pos(HEIGHT // 2)
 
-    if (ball.get_x_pos() > WIDTH):
-        ball.set_pos(WIDTH // 2, HEIGHT // 2)
-        player_1.sum_score()
-        score = player_1.get_score()
-        player_1.set_pos(HEIGHT // 2)
-        player_2.set_pos(HEIGHT // 2)
-        
+    #Obtenemos puntajes que tiene cada jugador    
     player_1_score = player_1.get_score()
     player_2_score = player_2.get_score()
 
+
+    #--------------Condicion de FIN DE JUEGO------------------
+    #Si un jugador supera 10 puntos es porque gano
     if player_1_score == 10:
         end_game = True
         end_game_message = "El jugador 1 ha ganado la partida"
@@ -218,17 +226,21 @@ while running:  #Ciclo continuo para el funcionamiento del juego
         end_game = True
         end_game_message = "El jugador 2 ha ganado la partida"
 
+    #Variables para la actualizacion del puntaje de cada jugador en pantalla
     text_1 = f"Score: {player_1_score}"
     text_2 = f"Score: {player_2_score}"
     
-    screen.blit(background, [0, 0])
-    all_sprites.draw(screen)
+    screen.blit(background, [0, 0]) #Actualizacion de pantalla para los cambios en posiciones de jugadores, pelota e incremento de puntaje
+    all_sprites.draw(screen)    #Actualizacion en pantalla de los sprits del juego
 
+    #Dibujado en pantalla de los puntajes de cada jugador
     draw_text(screen, text_1, 50, 90, 20)
     draw_text(screen, text_2, 50, WIDTH - 90, 20)
 
-    pygame.display.update()
+    #Llamado del metodo Update de cada objeto del juego
+    pygame.display.update() 
 
+#--------------Cierre del programa------------------
 pygame.quit()
 cap.release()
 cv2.destroyAllWindows()
